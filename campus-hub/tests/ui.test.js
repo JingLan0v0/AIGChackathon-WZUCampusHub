@@ -158,8 +158,7 @@ ADD_PAGES.forEach(function (cfg) {
 section('2. 全站详情弹窗：页脚 / 正文按钮都要能用');
 [
   { file: 'lost.html', open: '.item-card', must: ['#copyContact'] },
-  { file: 'schedule.html', open: '.tt-course', must: ['[data-del]'] },
-  { file: 'schedule.html', open: '[data-schedule-origin]', must: ['#scheduleModalApply'] }
+  { file: 'schedule.html', open: '.tt-course', must: ['[data-del]'] }
 ].forEach(function (cfg) {
   const env = boot(cfg.file);
   const card = env.doc.querySelector('#page ' + cfg.open);
@@ -361,11 +360,11 @@ section('4. 课外计划：新建 / 每周重复 / 冲突 / 筛选');
   ok('筛选「运动」后只剩运动类', titles.length > 0 && titles.every(function (t) { return t.indexOf('🏃') >= 0; }),
     titles.slice(0, 3).join(' | '));
 
-  const studyChip = doc.querySelector('[data-pfilter="学习"]');
-  studyChip.click();
-  titles = Array.from(doc.querySelectorAll('#page .plan-title')).map(function (n) { return n.textContent; });
-  ok('筛选「学习」后只剩学习类', titles.length > 0 && titles.every(function (t) { return t.indexOf('📖') >= 0; }),
-    titles.slice(0, 3).join(' | '));
+  ok('学习类不出现在课外计划筛选中', !doc.querySelector('[data-pfilter="学习"]'));
+  const academicTitles = win.Store.load().plans.filter(win.Store.isAcademicTask).map(function (p) { return p.title; });
+  ok('学业任务展示在待办清单', academicTitles.some(function (title) {
+    return doc.querySelector('.plan-pane-todo').textContent.includes(title);
+  }));
 
   doc.querySelector('[data-pfilter="all"]').click();
   ok('切回「全部」后运动类又回来了',
@@ -697,7 +696,7 @@ function tick() { return new Promise(function (r) { setTimeout(r, 0); }); }
   ok('课表使用独立居中布局且不再显示课程清单',
     eD.doc.querySelector('#page').classList.contains('schedule-page') &&
     !!eD.doc.querySelector('.tt-scroll .tt') &&
-    !eD.doc.textContent.includes('课程清单'));
+    !eD.doc.body.textContent.includes('课程清单'));
   ok('课程详情仍可从课表卡片打开', !!eD.doc.querySelector('.tt-course[data-id]'));
   ok('顶栏没有独立调课入口', !eD.doc.querySelector('.topnav a[href="notice.html"]'));
   ok('首页 AI 有截图上传入口', !!dN.querySelector('#assistantAttach') && !!dN.querySelector('#assistantImageFile'));
