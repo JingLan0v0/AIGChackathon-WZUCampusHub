@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>校园百事通 · 路演</title>
+<style>
+/* ==========================================================
+   校园百事通 · 路演幻灯片（单文件，图片已内嵌）
+   演示方式：点一下出一块内容（逐条展现），点完本页才翻页
+   键盘：→ / 空格 / 点一下 = 继续；← = 回退；F 全屏；N 备注；Home/End 首尾
+   ========================================================== */
+:root {
+  --bg: #EEF2F9; --surface: #FFFFFF; --surface-2: #F4F7FC;
+  --line: #E1E8F3; --text: #131A2A; --text-2: #45506A; --muted: #8892A6;
+  --primary: #3A5BFF; --primary-d: #2A44D6; --primary-l: #E8EDFF;
+  --violet: #7A5CFF; --cyan: #00B8CC; --accent: #FF7A45;
+  --green: #12B76A; --green-l: #E6F8EF; --red: #F04438; --red-l: #FDECEA;
+  --yellow: #F79009; --yellow-l: #FEF4E6;
+  --shadow-1: 0 1px 2px rgba(19,26,42,.05), 0 6px 20px rgba(19,26,42,.06);
+  --shadow-2: 0 14px 40px rgba(19,26,42,.16);
+}
+* { box-sizing: border-box; }
+html, body {
+  margin: 0; height: 100%; overflow: hidden;
+  background: radial-gradient(1200px 700px at 50% -10%, #dfe7f8 0%, var(--bg) 55%, #e6ecf7 100%);
+  font-family: "PingFang SC", "Microsoft YaHei", "Hiragino Sans GB", system-ui, -apple-system, sans-serif;
+  color: var(--text); -webkit-font-smoothing: antialiased;
+}
+#stage { position: absolute; left: 50%; top: 50%; width: 1280px; height: 720px;
+  transform-origin: center center; }
+.slide { position: absolute; inset: 0; background: var(--surface); border-radius: 26px;
+  box-shadow: var(--shadow-2); padding: 46px 56px 52px; overflow: hidden;
+  opacity: 0; visibility: hidden; transform: translateY(10px) scale(.995);
+  transition: opacity .32s ease, transform .32s ease; display: flex; flex-direction: column; }
+.slide.active { opacity: 1; visibility: visible; transform: none; }
+
+/* 页眉 */
+.kicker { display: inline-flex; align-items: center; gap: 10px; font-size: 15px; font-weight: 600;
+  color: var(--primary); background: var(--primary-l); border-radius: 100px; padding: 7px 16px; }
+.kicker .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--primary); }
+h1 { font-size: 78px; line-height: 1.05; margin: 0; letter-spacing: -1px; }
+h2 { font-size: 42px; line-height: 1.2; margin: 14px 0 0; letter-spacing: -.5px; }
+h3 { font-size: 24px; margin: 0; }
+p { margin: 0; color: var(--text-2); line-height: 1.65; font-size: 19px; }
+.sub { font-size: 22px; color: var(--text-2); line-height: 1.6; }
+.small { font-size: 15px; color: var(--muted); }
+.hl { color: var(--primary); font-weight: 700; }
+.hl-r { color: var(--red); font-weight: 700; }
+.hl-g { color: var(--green); font-weight: 700; }
+.big { font-size: 30px; font-weight: 700; line-height: 1.4; }
+.mono { font-family: ui-monospace, Consolas, "Courier New", monospace; }
+
+/* 逐条展现 */
+.frag { opacity: 0; transform: translateY(18px); transition: opacity .45s ease, transform .45s cubic-bezier(.2,.7,.3,1); }
+.frag.on { opacity: 1; transform: none; }
+.slide.active .frag:not(.on) { pointer-events: none; }
+
+/* 通用容器 */
+.row { display: flex; gap: 26px; }
+.col { flex: 1; min-width: 0; }
+.spacer { flex: 1; }
+.card { background: var(--surface-2); border: 1px solid var(--line); border-radius: 18px; padding: 18px 20px; }
+.card.hot { background: var(--red-l); border-color: #F7C9C4; }
+.card.cool { background: var(--primary-l); border-color: #CBD7FF; }
+.card.good { background: var(--green-l); border-color: #BFE9D3; }
+.card.warn { background: var(--yellow-l); border-color: #F8DFB8; }
+.num { display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px;
+  border-radius: 9px; background: var(--primary); color: #fff; font-weight: 700; font-size: 16px; flex: none; }
+.pain { display: flex; gap: 14px; align-items: flex-start; padding: 13px 18px; border-radius: 16px;
+  background: var(--surface-2); border: 1px solid var(--line); }
+.pain .ico { font-size: 24px; line-height: 1.2; }
+.pain b { font-size: 20px; }
+.pain .then { color: var(--red); font-weight: 600; }
+
+/* 手机截图框：原图是 430×932 的长图，按框高裁掉底部（底栏不重要，留内容区）。
+   高度统一由 img 决定 —— 只给容器写 height 的话，图片本身的高度照样会把整行撑开。 */
+.phone { border-radius: 26px; overflow: hidden; border: 1px solid var(--line); background: #fff;
+  box-shadow: var(--shadow-1); flex: none; }
+.phone img { display: block; width: 100%; height: 520px; object-fit: cover; object-position: top; }
+.phone.h470 img { height: 470px; }
+.phone.h500 img { height: 500px; }
+.phone.h520 img { height: 520px; }
+.phone.h540 img { height: 540px; }
+
+/* AI 条目 */
+.ai { display: flex; gap: 11px; align-items: flex-start; padding: 9px 13px; border-radius: 14px;
+  background: var(--surface-2); border: 1px solid var(--line); margin-bottom: 8px; }
+.ai .t { font-weight: 700; font-size: 17.5px; line-height: 1.3; }
+.ai .d { color: var(--text-2); font-size: 14.5px; margin-top: 2px; line-height: 1.45; }
+.ai .tag { flex: none; font-size: 11.5px; font-weight: 700; color: var(--violet); background: #F0EBFF;
+  border-radius: 8px; padding: 3px 8px; margin-top: 2px; }
+
+/* 九宫格 */
+.grid9 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.g9 { display: flex; flex-direction: column; gap: 4px; padding: 14px 16px; border-radius: 16px;
+  background: var(--surface-2); border: 1px solid var(--line); }
+.g9 b { font-size: 19px; } .g9 small { color: var(--muted); font-size: 13.5px; line-height: 1.45; }
+.g9 .e { font-size: 22px; }
+
+/* 封面 */
+.cover { background: linear-gradient(135deg, #3A5BFF 0%, #5B4BFF 48%, #7A5CFF 100%); color: #fff; }
+.cover h1 { color: #fff; }
+.cover .sub, .cover p { color: rgba(255,255,255,.9); }
+.cover .kicker { background: rgba(255,255,255,.16); color: #fff; }
+.cover .kicker .dot { background: #fff; }
+.cover .brand { display: flex; align-items: center; gap: 16px; }
+.cover .logo { width: 68px; height: 68px; border-radius: 20px; background: rgba(255,255,255,.18);
+  display: flex; align-items: center; justify-content: center; font-size: 34px; }
+.cover .foot { color: rgba(255,255,255,.82); }
+
+/* 结尾 */
+.end { background: linear-gradient(135deg, #16204A 0%, #23307A 55%, #3A5BFF 100%); color: #fff; }
+.end h2, .end h1 { color: #fff; }
+.end p { color: rgba(255,255,255,.86); }
+.end .kicker { background: rgba(255,255,255,.16); color: #fff; }
+
+/* 顶部进度 + 页码 + 提示 */
+#bar { position: fixed; left: 0; top: 0; height: 4px; background: var(--primary); width: 0;
+  transition: width .3s ease; z-index: 50; }
+#pageNo { position: fixed; right: 22px; bottom: 16px; font-size: 14px; color: var(--muted);
+  font-variant-numeric: tabular-nums; z-index: 50; }
+#hint { position: fixed; left: 22px; bottom: 16px; font-size: 14px; color: var(--muted); z-index: 50; }
+#hint b { color: var(--primary); }
+#dots { position: fixed; left: 50%; bottom: 14px; transform: translateX(-50%); display: flex; gap: 7px; z-index: 50; }
+#dots i { width: 7px; height: 7px; border-radius: 50%; background: #C7D1E4; display: block; }
+#dots i.on { background: var(--primary); width: 20px; border-radius: 4px; }
+
+/* 演讲备注 */
+#notes { position: fixed; left: 0; right: 0; bottom: 0; background: rgba(19,26,42,.94); color: #EAF0FA;
+  padding: 14px 24px 18px; font-size: 15px; line-height: 1.6; display: none; z-index: 60; }
+#notes.show { display: block; }
+#notes b { color: #9DB2FF; }
+@media print { #hint, #dots, #pageNo, #bar { display: none; } }
+</style>
+</head>
+<body>
+<div id="bar"></div>
+<div id="stage">
+
+<!-- 01 封面 -->
+<section class="slide cover active" data-note="先自报家门：温州大学 · 校园百事通 · 赛道二。一句话说明白我们做的是什么——把学生每天要开的那几个工具，收进一个入口。">
+  <div class="brand">
+    <div class="logo">🎓</div>
+    <div>
+      <div class="kicker"><span class="dot"></span>温州大学 · 校园生活百事通 · 赛道二</div>
+    </div>
+  </div>
+  <div style="height:76px"></div>
+  <h1>校园百事通</h1>
+  <div class="frag" style="margin-top:18px">
+    <div class="sub" style="font-size:30px;color:rgba(255,255,255,.95);font-weight:600">
+      温大学生的一站式校园助手
+    </div>
+  </div>
+  <div class="frag" style="margin-top:28px">
+    <p style="font-size:21px;max-width:900px">
+      把「天气 · 课表 · 调课通知 · 作业 DDL · 课外计划 · 二手 · 失物 · 问答」<br>
+      收进<strong style="color:#fff">一个入口、一次登录</strong>，而且<strong style="color:#fff">听得懂人话</strong>。
+    </p>
+  </div>
+  <div class="spacer"></div>
+  <div class="frag foot" style="font-size:16px;line-height:1.9">
+    <div>选手：forey　|　温州大学计算机与人工智能学院</div>
+    <div>现场演示：<span class="mono" style="color:#fff">campus-hub-57981.app.workbuddy.host</span>　（演示账号 20230427）</div>
+  </div>
+</section>
+
+<!-- 02 痛点：一天要为自己的信息付出多少步 -->
+<section class="slide" data-note="这一页不要急着讲产品，先讲他每天的真实处境。每点一下出一个场景，语气可以稍带吐槽——评委自己也是这么过来的。最后一句「五件事 = 五个入口」是转折点，说完停一秒再翻页。">
+  <div class="kicker"><span class="dot"></span>01 · 问题</div>
+  <h2>查一次校园信息，要付出多少步？</h2>
+  <div style="height:22px"></div>
+  <div class="frag"><div class="pain"><div class="ico">☀️</div><div><b>想知道今天穿什么</b>　<span class="then">→ 得再开一个天气 App / 网页</span></div></div></div>
+  <div style="height:10px"></div>
+  <div class="frag"><div class="pain"><div class="ico">📝</div><div><b>想记住作业 DDL</b>　<span class="then">→ 打开备忘录，自己再敲一遍</span></div></div></div>
+  <div style="height:10px"></div>
+  <div class="frag"><div class="pain"><div class="ico">📅</div><div><b>想看课表</b>　<span class="then">→ 先过统一身份认证，再在一堆菜单里找入口</span></div></div></div>
+  <div style="height:10px"></div>
+  <div class="frag"><div class="pain"><div class="ico">🔔</div><div><b>想确认有没有调课</b>　<span class="then">→ 翻教务系统，翻不到就当没发生</span></div></div></div>
+  <div style="height:10px"></div>
+  <div class="frag"><div class="pain"><div class="ico">🛒</div><div><b>想买二手 / 找失物</b>　<span class="then">→ 微信群爬楼，刷过去就没了</span></div></div></div>
+  <div class="spacer"></div>
+  <div class="frag"><div class="card hot" style="text-align:center;padding:16px">
+    <span class="big">五件事 <span class="hl-r">=</span> 五个入口 <span class="hl-r">=</span> 五次登录与切换</span>
+  </div></div>
+</section>
+
+<!-- 03 痛点归纳 -->
+<section class="slide" data-note="把上一页的具体场景收成三个抽象问题：散、漏、记不住。这三条后面正是我们的三个卖点（统一入口 / 主动提醒 / 说人话），所以这里要点透，后面才能呼应。">
+  <div class="kicker"><span class="dot"></span>02 · 问题</div>
+  <h2>问题不在「功能不够」，在<span class="hl">「入口太散」</span></h2>
+  <div style="height:26px"></div>
+  <div class="frag"><div class="card cool" style="display:flex;gap:16px;align-items:center;padding:20px 22px">
+    <div class="num">1</div><div><b style="font-size:22px">入口散</b>
+      <div class="small" style="font-size:16px;margin-top:4px">一天里在 5 个工具之间来回切，每次都重新找、重新登</div></div>
+  </div></div>
+  <div style="height:12px"></div>
+  <div class="frag"><div class="card warn" style="display:flex;gap:16px;align-items:center;padding:20px 22px">
+    <div class="num" style="background:var(--yellow)">2</div><div><b style="font-size:22px">会漏</b>
+      <div class="small" style="font-size:16px;margin-top:4px">调课通知躺在教务系统里，不主动看就错过——去了才发现教室换了</div></div>
+  </div></div>
+  <div style="height:12px"></div>
+  <div class="frag"><div class="card" style="display:flex;gap:16px;align-items:center;padding:20px 22px">
+    <div class="num" style="background:var(--violet)">3</div><div><b style="font-size:22px">记不住</b>
+      <div class="small" style="font-size:16px;margin-top:4px">作业靠脑子记，备忘录又懒得敲一遍——工具越多，越不想用</div></div>
+  </div></div>
+  <div class="spacer"></div>
+  <div class="frag"><div class="big" style="color:var(--primary)">
+    学生要的不是更多功能，是一个「不用记、不用切」的地方。
+  </div></div>
+</section>
+
+<!-- 04 答案 -->
+<section class="slide" data-note="转折页。我们的答案就是三个词：统一入口、一次登录、说人话。第三个是关键差异——市面上把功能堆在一起的产品很多，但「让学生用一句人话说事」的不多，这也是 AI 真正上场的地方。">
+  <div class="kicker"><span class="dot"></span>03 · 我们的答案</div>
+  <h2>一个入口，一次登录，<span class="hl">说人话就行</span></h2>
+  <div style="height:30px"></div>
+  <div class="row" style="gap:18px">
+    <div class="col frag"><div class="card" style="height:210px;display:flex;flex-direction:column;gap:10px">
+      <div style="font-size:34px">🧩</div><b style="font-size:24px">九个入口，一个顶栏</b>
+      <div class="small" style="font-size:16px">首页 / 规划 / 课表 / 调课 / 作业 / 二手 / 失物 / 问答 / 我的，全部一个顶栏切到底</div>
+    </div></div>
+    <div class="col frag"><div class="card" style="height:210px;display:flex;flex-direction:column;gap:10px">
+      <div style="font-size:34px">🔑</div><b style="font-size:24px">一次登录，跨页免登</b>
+      <div class="small" style="font-size:16px">学号绑定后，本机所有页面直进；多账号可一键切换、数据按学号互相隔离</div>
+    </div></div>
+    <div class="col frag"><div class="card cool" style="height:210px;display:flex;flex-direction:column;gap:10px">
+      <div style="font-size:34px">✨</div><b style="font-size:24px">说人话就行</b>
+      <div class="small" style="font-size:16px">「明晚 7 点图书馆自习」「明天上午请病假，因为发烧」——一句话，它自己判断该记成什么</div>
+    </div></div>
+  </div>
+  <div class="spacer"></div>
+  <div class="frag"><p class="sub">
+    我们不是把功能搬到一起，而是让它<span class="hl">听得懂人话、自己找到该去的位置</span>。
+  </p></div>
+</section>
+
+<!-- 05 九个入口 -->
+<section class="slide" data-note="快速过一遍产品形态，不用逐个讲。左九宫格分三批亮，右边留一张真机首页截图——让评委先看到一个真实的产品，而不是一张架构图。">
+  <div class="kicker"><span class="dot"></span>04 · 它长这样</div>
+  <h2>九个模块，覆盖校园生活的一天</h2>
+  <div style="height:20px"></div>
+  <div class="row">
+    <div class="col" style="flex:1.35">
+      <div class="grid9">
+        <div class="g9 frag"><span class="e">🏠</span><b>首页</b><small>天气 + 出行建议 + 今日规划摘要</small></div>
+        <div class="g9 frag"><span class="e">🧭</span><b>今日规划</b><small>按空档与 DDL 排出的专注安排</small></div>
+        <div class="g9 frag"><span class="e">📅</span><b>智能课表</b><small>温大真实作息 11 节 · 支持导入</small></div>
+        <div class="g9 frag"><span class="e">🔔</span><b>调课通知</b><small>抓取 → 解析 → 一键应用到课表</small></div>
+        <div class="g9 frag"><span class="e">📝</span><b>作业 DDL</b><small>倒计时 / 逾期提醒 / 一键完成</small></div>
+        <div class="g9 frag"><span class="e">🛒</span><b>二手集市</b><small>发布 · 筛选 · 联系卖家</small></div>
+        <div class="g9 frag"><span class="e">🔍</span><b>失物招领</b><small>丢了 / 捡到，分开找</small></div>
+        <div class="g9 frag"><span class="e">💬</span><b>校园问答</b><small>选课、食堂、报修都有人答</small></div>
+        <div class="g9 frag"><span class="e">👤</span><b>我的</b><small>学籍 · 导入导出 · 多账号切换</small></div>
+      </div>
+    </div>
+    <div class="frag" style="flex:none">
+      <div class="phone h470" style="width:300px"><img src="{{SHOT:02-home}}" alt="首页"></div>
+    </div>
+  </div>
+</section>
+
+<!-- 06 操作① 一句话记下来 -->
+<section class="slide" data-note="这是我们的核心交互，讲慢一点。强调三点：① 一句话里可以有多件事，它自己拆；② 理解结果先给用户核对，是可改的，不是黑盒直接写库；③ 认不出来会直说没看懂，绝不瞎建条目。">
+  <div class="kicker"><span class="dot"></span>05 · 核心操作一</div>
+  <h2>一句话记下来：<span class="hl">说人话，它自己归类</span></h2>
+  <div style="height:18px"></div>
+  <div class="row">
+    <div style="flex:none" class="frag">
+      <div class="phone h520" style="width:290px"><img src="{{SHOT:03-nl-parse}}" alt="一句话记下来"></div>
+    </div>
+    <div class="col">
+      <div class="frag"><div class="card cool" style="padding:16px 18px">
+        <div class="small" style="font-size:14px">你说</div>
+        <div class="mono" style="font-size:18px;margin-top:4px">「高数作业 周五 23:59 交；明晚 7 点 图书馆自习 2 小时」</div>
+      </div></div>
+      <div style="height:12px"></div>
+      <div class="frag"><div class="ai"><span class="tag">拆句</span><div><div class="t">一句话拆成两件事</div>
+        <div class="d">分号 / 换行都能拆，最多一次记 5 件，互不干扰</div></div></div></div>
+      <div class="frag"><div class="ai"><span class="tag">分类</span><div><div class="t">自动判断该记成什么</div>
+        <div class="d">作业 DDL / 课外计划 / 课表补充 / 请假条——四类各有各的去处</div></div></div></div>
+      <div class="frag"><div class="ai"><span class="tag">抽字段</span><div><div class="t">时间、地点、类型、重要度全抽出来</div>
+        <div class="d">「高数」自动对上真实课表里的「高等数学 A(一)」，地点认出「图书馆」「计算机楼-402」</div></div></div></div>
+      <div class="frag"><div class="ai"><span class="tag">可改</span><div><div class="t">先给你看「我理解为」，确认才写库</div>
+        <div class="d">字段全部可现场修改，不满意可以「不要这条」</div></div></div></div>
+      <div class="frag"><div class="card warn" style="padding:14px 18px">
+        <b>看不懂就直说看不懂：</b><span class="small" style="font-size:16px">认不出来的字段会明确标出来让用户补，不会瞎填一个默认值糊过去。</span>
+      </div></div>
+    </div>
+  </div>
+</section>
+
+<!-- 07 操作② 请假条 -->
+<section class="slide" data-note="这是最能体现「AI 省事」的一页：请假条本来是学生最烦的格式活，现在一句话生成、一键复制。特别提一句「不写进日程、不上传、缺信息留占位」——这是我们对隐私和诚实的态度。">
+  <div class="kicker"><span class="dot"></span>06 · 核心操作二</div>
+  <h2>请假条：一句话，生成能直接发的正文</h2>
+  <div style="height:18px"></div>
+  <div class="row">
+    <div style="flex:none" class="frag">
+      <div class="phone h520" style="width:290px"><img src="{{SHOT:04-leave}}" alt="请假条"></div>
+    </div>
+    <div class="col">
+      <div class="frag"><div class="card cool" style="padding:16px 18px">
+        <div class="small" style="font-size:14px">你说</div>
+        <div class="mono" style="font-size:18px;margin-top:4px">「明天上午请病假，因为发烧要去校医院」</div>
+      </div></div>
+      <div style="height:12px"></div>
+      <div class="frag"><div class="ai"><span class="tag">识别</span><div><div class="t">假别 / 时间 / 时段 / 天数</div>
+        <div class="d">病假 · 明天上午（半天）· 或「请事假两天」「周五第 3-4 节」都能认</div></div></div></div>
+      <div class="frag"><div class="ai"><span class="tag">取理由</span><div><div class="t">理由从「因为」后面取，多余的字掐掉</div>
+        <div class="d">说「因为发烧要去校医院」，正文里就是这一句，不会带出「请病假」原词</div></div></div></div>
+      <div class="frag"><div class="ai"><span class="tag">成文</span><div><div class="t">自动拼出正式请假条</div>
+        <div class="d">抬头 · 学院班级学号 · 假别与时间 · 补课承诺 · 落款日期，可直接复制发给老师</div></div></div></div>
+      <div class="frag"><div class="card good" style="padding:14px 18px">
+        <b>不写进日程，只给你成品。</b><span class="small" style="font-size:16px">请假条是发给人的，不是日程；内容只在本机生成，姓名学院没填就留占位，系统不替你编。</span>
+      </div></div>
+    </div>
+  </div>
+</section>
+
+<!-- 08 操作③ 智能课表 -->
+<section class="slide" data-note="课表是校园应用的地基，我们把温大真实作息表做成了单一数据源：上午 1-5 节、下午从第 6 节 13:30 起、晚上一整段算第 11 节。讲师门难点时可以说「第 5 节 11:45 是午前最后一节，学校不排课」——这种细节最能证明我们真的对着温大做的。">
+  <div class="kicker"><span class="dot"></span>07 · 核心操作三</div>
+  <h2>智能课表：按温大<span class="hl">真实作息</span>长出来的</h2>
+  <div style="height:16px"></div>
+  <div class="row">
+    <div style="flex:none" class="frag">
+      <div class="phone h500" style="width:280px"><img src="{{SHOT:05-schedule}}" alt="课表"></div>
+    </div>
+    <div class="col">
+      <div class="frag"><div class="ai"><span class="tag">真实</span><div><div class="t">11 节真实作息，不是拍脑袋的模板</div>
+        <div class="d">上午 1–5 节（第 5 节 11:45–12:25 午前最后一节，学校不排课）· 下午从第 6 节 13:30 起 · 晚上一整段为第 11 节</div></div></div></div>
+      <div class="frag"><div class="ai"><span class="tag">导入</span><div><div class="t">三种方式把真实课表弄进来</div>
+        <div class="d">课表 PDF 识别 / 同源抓取脚本一键导入 / 一句话补充</div></div></div></div>
+      <div class="frag"><div class="ai"><span class="tag">细节</span><div><div class="t">连堂、周次、教室、教师都算对</div>
+        <div class="d">「第 2-9 节」不会被截断；同课同色；支持「南5-A101」这类字母门牌</div></div></div></div>
+      <div class="frag"><div class="card cool" style="padding:14px 18px">
+        <b>空课表也不是死路：</b><span class="small" style="font-size:16px">新同学第一次进来，页面直接给「去统一身份认证查课表 → 回来粘贴导入」的三步引导。</span>
+      </div></div>
+    </div>
+  </div>
+</section>
+
+<!-- 09 操作④ 调课通知 -->
+<section class="slide" data-note="这条解决「会漏」：通知从教务系统抓回来，解析成结构化，再自动匹配课表里的课。注意我们很克制——真实学号看不到任何编造样本，没有就是没有，页面给导入引导。这种诚实反而是加分项。">
+  <div class="kicker"><span class="dot"></span>08 · 核心操作四</div>
+  <h2>调课通知：抓回来，<span class="hl">自动落到课表上</span></h2>
+  <div style="height:16px"></div>
+  <div class="row">
+    <div style="flex:none" class="frag">
+      <div class="phone h520" style="width:280px"><img src="{{SHOT:06-notice}}" alt="调课通知"></div>
+    </div>
+    <div class="col">
+      <div class="frag"><div class="ai"><span class="tag">抓取</span><div><div class="t">从教务系统把通知原文取回来</div>
+        <div class="d">自己写的同源脚本一键复制 → 回页面粘贴导入；不碰密码、不调校外接口</div></div></div></div>
+      <div class="frag"><div class="ai"><span class="tag">解析</span><div><div class="t">把一段通知读成结构化的「哪门课、怎么变」</div>
+        <div class="d">原时间 → 新时间、新教室、停课/补课；识别「第 3 周周二第 6-7 节」这类写法</div></div></div></div>
+      <div class="frag"><div class="ai"><span class="tag">匹配</span><div><div class="t">自动对上你课表里的那门课</div>
+        <div class="d">按课程名 + 星期 + 起始节匹配，首页会提示「这周这门课先别按老时间去」</div></div></div></div>
+      <div class="frag"><div class="ai"><span class="tag">应用</span><div><div class="t">一键应用到课表，原安排标灰保留</div>
+        <div class="d">可撤销、可标记已读；影响今天的通知会被提到最上面</div></div></div></div>
+      <div class="frag"><div class="card warn" style="padding:14px 18px">
+        <b>不编造：</b><span class="small" style="font-size:16px">没有导入过真实通知的学号，页面一条假通知都不给，只给导入引导（演示账号才带样本）。</span>
+      </div></div>
+    </div>
+  </div>
+</section>
+
+<!-- 10 AI 在哪里 -->
+<section class="slide" data-note="这一页是评委最关注的「AI 含量」，一条条点亮，每条都配一句「它替代了什么人工动作」。如果时间紧，重点讲前三条（自然语言理解 / 生成请假条 / 通知解析）。">
+  <div class="kicker"><span class="dot"></span>09 · AI 到底做了什么</div>
+  <h2>AI 不是在贴标签，它在<span class="hl">替学生做这几件事</span></h2>
+  <div style="height:14px"></div>
+  <div class="row">
+    <div class="col">
+      <div class="frag"><div class="ai"><span class="tag">理解</span><div><div class="t">自然语言 → 结构化数据</div>
+        <div class="d">从「明晚 7 点图书馆自习 2 小时」里抽出日期、时刻、时长、地点、类型、重要度</div></div></div></div>
+      <div class="frag"><div class="ai"><span class="tag">分类</span><div><div class="t">意图识别</div>
+        <div class="d">判断这是计划、作业 DDL、课表补充，还是请假条——四类四种处理路径</div></div></div></div>
+      <div class="frag"><div class="ai"><span class="tag">生成</span><div><div class="t">请假条正文生成</div>
+        <div class="d">按学生信息、课时、理由、天数自动组织成正式文书，可直接发送</div></div></div></div>
+      <div class="frag"><div class="ai"><span class="tag">解析</span><div><div class="t">教务通知理解与课表改写</div>
+        <div class="d">从自然语言通知里定位课程、时间、教室变化，并映射到你课表的具体节次</div></div></div></div>
+    </div>
+    <div class="col">
+      <div class="frag"><div class="ai"><span class="tag">识别</span><div><div class="t">课表 PDF 识别</div>
+        <div class="d">读教务系统导出的课表 PDF，把「8:20–9:00」映射到第 1 节，连堂自动合并</div></div></div></div>
+      <div class="frag"><div class="ai"><span class="tag">建议</span><div><div class="t">天气 → 出行建议</div>
+        <div class="d">带不带伞、穿什么、骑车还是坐校车、几点适合运动，按当日温湿度与降水生成</div></div></div></div>
+      <div class="frag"><div class="ai"><span class="tag">排程</span><div><div class="t">今日规划自动排</div>
+        <div class="d">在课表空档里，按作业 DDL 与重要度排出「现在最该做什么」，并给一句话解释为什么</div></div></div></div>
+      <div class="frag"><div class="card cool" style="padding:14px 18px">
+        <b>共同点：</b><span class="small" style="font-size:16px">都在替代学生「自己想、自己敲、自己翻」的动作，而不是多给一个界面。</span>
+      </div></div>
+    </div>
+  </div>
+</section>
+
+<!-- 11 为什么本地引擎 -->
+<section class="slide" data-note="主动交代技术选择，评委会问「为什么不用大模型」。答：不是不会用，是这四个理由。最后一条要强调——我们的架构是「可替换」的，接上大模型能力只会更强，这不是封闭设计。">
+  <div class="kicker"><span class="dot"></span>10 · 技术选择</div>
+  <h2>为什么是<span class="hl">本地智能引擎</span>，而不是调一个大模型接口？</h2>
+  <div style="height:22px"></div>
+  <div class="row">
+    <div class="col">
+      <div class="frag"><div class="card" style="margin-bottom:12px"><b style="font-size:21px">① 断网也能用</b>
+        <div class="small" style="font-size:16px;margin-top:5px">现场演示不赌网络。整个应用是零依赖静态站，双击本地文件就能跑。</div></div></div>
+      <div class="frag"><div class="card" style="margin-bottom:12px"><b style="font-size:21px">② 隐私留在本机</b>
+        <div class="small" style="font-size:16px;margin-top:5px">课表、作业、请假条都是私事，不该往第三方接口发。数据全部存在本机。</div></div></div>
+    </div>
+    <div class="col">
+      <div class="frag"><div class="card" style="margin-bottom:12px"><b style="font-size:21px">③ 每一步都能讲清楚</b>
+        <div class="small" style="font-size:16px;margin-top:5px">为什么把它读成 19 点？规则摆在明面上，界面上也能解释，不是黑盒。</div></div></div>
+      <div class="frag"><div class="card cool"><b style="font-size:21px">④ 可替换，不是封闭</b>
+        <div class="small" style="font-size:16px;margin-top:5px">解析能力都收在 <span class="mono">NL.parseAll()</span> / <span class="mono">Adjust.sync()</span> 这样的单一入口，接大模型只需替换一个函数。</div></div></div>
+    </div>
+  </div>
+  <div class="spacer"></div>
+  <div class="frag"><p class="sub">我们先用规则把高频表达做扎实，再谈要不要上大模型——顺序不能反。</p></div>
+</section>
+
+<!-- 12 真实教务接入 -->
+<section class="slide" data-note="这页讲「我们没吹牛」：统一身份认证是网易 SSO + 人机验证，静态页直连拿不到会话，所以我们不硬闯，改成同源抓取脚本 + 一键导入。把自己的技术边界说清楚，比嘴上说「全面打通」更可信。">
+  <div class="kicker"><span class="dot"></span>11 · 真实数据怎么进来</div>
+  <h2>不硬闯登录，<span class="hl">用学生自己的会话把数据带回来</span></h2>
+  <div style="height:22px"></div>
+  <div class="frag"><div class="card warn" style="margin-bottom:14px">
+    <b style="font-size:20px">先说难点：</b>
+    <span style="font-size:17px">统一身份认证是网易 SSO，表单动态渲染、密码用公钥加密、还有人机验证——静态页面直连拿不到会话，硬做就是死路。</span>
+  </div></div>
+  <div class="frag"><div class="row" style="gap:14px">
+    <div class="col card cool"><b style="font-size:20px">① 同源抓取</b>
+      <div class="small" style="font-size:16px;margin-top:6px">学生在自己已登录的教务页面上运行我们给的脚本（一行复制），把课表与通知原文读出来</div></div>
+    <div class="col card cool"><b style="font-size:20px">② 一键导入</b>
+      <div class="small" style="font-size:16px;margin-top:6px">回应用粘贴，本地解析成课表与通知；也可直接上传课表 PDF</div></div>
+    <div class="col card cool"><b style="font-size:20px">③ 同一条链路</b>
+      <div class="small" style="font-size:16px;margin-top:6px">导入数据与演示样本走完全相同的解析逻辑，正式版只需换掉取数那一步</div></div>
+  </div></div>
+  <div class="spacer"></div>
+  <div class="frag"><p class="sub">
+    全程<span class="hl-g">不接触学生密码</span>、不调校外接口、不落地到任何服务器。
+  </p></div>
+</section>
+
+<!-- 13 演示动线 -->
+<section class="slide" data-note="给评委一个「接下来看什么」的路线图，方便你现场操作时他们跟得上。也可以把这一页当作彩排清单——照着点一遍，30 秒内讲完。">
+  <div class="kicker"><span class="dot"></span>12 · 现场演示路线</div>
+  <h2>跟着点一遍，30 秒看清全貌</h2>
+  <div style="height:22px"></div>
+  <div class="frag"><div class="card" style="display:flex;gap:16px;align-items:center;margin-bottom:11px">
+    <div class="num">1</div><div><b style="font-size:20px">打开链接 → 学号登录</b>
+      <div class="small" style="font-size:15.5px">演示账号 20230427 · 首页直接看到天气、出行建议与今日规划摘要</div></div></div></div>
+  <div class="frag"><div class="card" style="display:flex;gap:16px;align-items:center;margin-bottom:11px">
+    <div class="num">2</div><div><b style="font-size:20px">一句话记下来</b>
+      <div class="small" style="font-size:15.5px">说「高数作业 周五 23:59 交；明晚 7 点图书馆自习 2 小时」→ 出一张可改的解析卡 → 确认落库</div></div></div></div>
+  <div class="frag"><div class="card" style="display:flex;gap:16px;align-items:center;margin-bottom:11px">
+    <div class="num">3</div><div><b style="font-size:20px">请假条生成</b>
+      <div class="small" style="font-size:15.5px">说「明天上午请病假，因为发烧要去校医院」→ 生成正文 → 复制（可现场粘贴到聊天框）</div></div></div></div>
+  <div class="frag"><div class="card" style="display:flex;gap:16px;align-items:center;margin-bottom:11px">
+    <div class="num">4</div><div><b style="font-size:20px">课表 + 调课通知</b>
+      <div class="small" style="font-size:15.5px">看温大真实作息 11 节；调课页一条通知点「应用到课表」，回课表页看它变了</div></div></div></div>
+  <div class="frag"><div class="card" style="display:flex;gap:16px;align-items:center">
+    <div class="num">5</div><div><b style="font-size:20px">手机打开同一个链接</b>
+      <div class="small" style="font-size:15.5px">换一个学号登录 → 数据互相隔离；二手 / 失物 / 问答也能直接用</div></div></div></div>
+</section>
+
+<!-- 14 收尾 -->
+<section class="slide end" data-note="收尾不要念清单，只讲一句核心话术：「把五个入口，收进一个听得懂人话的入口。」然后留链接请评委自己试。">
+  <div class="kicker"><span class="dot"></span>一句话收尾</div>
+  <div style="height:34px"></div>
+  <h1 style="font-size:56px">把五个入口，<br>收进一个<span style="color:#9DB2FF">听得懂人话</span>的入口</h1>
+  <div style="height:26px"></div>
+  <div class="frag"><p class="sub" style="max-width:980px">
+    天气、课表、调课、作业、二手失物——过去要开五个工具、登五次录、记五遍；<br>
+    现在一句话说给它听，它自己判断该去哪、该记成什么、该提醒什么。
+  </p></div>
+  <div class="spacer"></div>
+  <div class="frag row" style="gap:14px">
+    <div class="col card" style="background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.22)">
+      <b style="color:#fff">已完成</b>
+      <div style="color:rgba(255,255,255,.85);font-size:15.5px;line-height:1.8;margin-top:6px">
+        9 个模块全通 · 温大真实作息 · 多账号隔离 · 课表 PDF 识别与导入 · 自然语言记录 · 请假条生成
+      </div>
+    </div>
+    <div class="col card" style="background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.22)">
+      <b style="color:#fff">下一步</b>
+      <div style="color:rgba(255,255,255,.85);font-size:15.5px;line-height:1.8;margin-top:6px">
+        接真实教务接口（课表 / 成绩 / 通知）· 二手交易闭环 · 校园问答接入学校知识库
+      </div>
+    </div>
+  </div>
+  <div style="height:26px"></div>
+  <div class="frag" style="color:#fff;font-size:19px">
+    🎓 校园百事通　<span class="mono" style="color:#9DB2FF">campus-hub-57981.app.workbuddy.host</span>
+  </div>
+</section>
+
+</div>
+
+<div id="hint">点一下<b>继续</b> · ← 回退 · F 全屏 · N 备注</div>
+<div id="dots"></div>
+<div id="pageNo"></div>
+<div id="notes"></div>
+
+<script>
+(function () {
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var dots = document.getElementById('dots');
+  var pageNo = document.getElementById('pageNo');
+  var bar = document.getElementById('bar');
+  var notes = document.getElementById('notes');
+  var cur = 0, f = 0;
+
+  slides.forEach(function (s, i) {
+    var d = document.createElement('i');
+    if (i === 0) d.className = 'on';
+    dots.appendChild(d);
+  });
+
+  function frags(i) {
+    return Array.prototype.slice.call(slides[i].querySelectorAll('.frag'));
+  }
+  function paint() {
+    var list = frags(cur);
+    list.forEach(function (el, i) { el.classList.toggle('on', i < f); });
+    slides.forEach(function (s, i) { s.classList.toggle('active', i === cur); });
+    Array.prototype.forEach.call(dots.children, function (d, i) { d.className = i === cur ? 'on' : ''; });
+    pageNo.textContent = (cur + 1) + ' / ' + slides.length;
+    bar.style.width = ((cur + 1) / slides.length * 100) + '%';
+    notes.innerHTML = '<b>备注 · 第 ' + (cur + 1) + ' 页</b>　' + (slides[cur].getAttribute('data-note') || '（这页没写备注）');
+    location.hash = 'p' + (cur + 1);
+  }
+  /* 进下一页：先看本页还有没有没亮的内容，有就亮一个（这就是「点击逐步展现」） */
+  function next() {
+    var list = frags(cur);
+    if (f < list.length) { f++; paint(); return; }
+    if (cur < slides.length - 1) { cur++; f = 0; paint(); }
+  }
+  function prev() {
+    if (f > 0) { f--; paint(); return; }
+    if (cur > 0) { cur--; f = frags(cur).length; paint(); }
+  }
+  function goto(n, revealAll) {
+    cur = Math.max(0, Math.min(slides.length - 1, n));
+    f = revealAll ? frags(cur).length : 0;
+    paint();
+  }
+
+  document.addEventListener('click', function (e) {
+    if (e.target.closest('#notes')) return;
+    next();
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown' || e.key === 'Enter') { e.preventDefault(); next(); }
+    else if (e.key === 'ArrowLeft' || e.key === 'PageUp' || e.key === 'Backspace') { e.preventDefault(); prev(); }
+    else if (e.key === 'Home') { goto(0); }
+    else if (e.key === 'End') { goto(slides.length - 1, true); }
+    else if (e.key === 'f' || e.key === 'F') {
+      if (document.fullscreenElement) document.exitFullscreen();
+      else document.documentElement.requestFullscreen();
+    }
+    else if (e.key === 'n' || e.key === 'N') { notes.classList.toggle('show'); }
+    else if (/^[1-9]$/.test(e.key)) { goto(parseInt(e.key, 10) - 1); }
+  });
+
+  /* 投影仪分辨率各不相同：把 1280×720 的舞台等比缩放到当前窗口 */
+  function fit() {
+    var s = Math.min(window.innerWidth / 1280, window.innerHeight / 720) * 0.96;
+    document.getElementById('stage').style.transform =
+      'translate(-50%, -50%) scale(' + s + ')';
+  }
+  window.addEventListener('resize', fit);
+  fit();
+
+  /* 支持 ?p=3 直接跳到第 3 页（彩排时省事） */
+  var m = /p=(\d+)/.exec(location.search);
+  if (m) goto(parseInt(m[1], 10) - 1); else paint();
+})();
+</script>
+</body>
+</html>

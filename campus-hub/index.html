@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#13264e">
+<meta name="description" content="校园百事通 · 导入课表，结合课程、作业和计划生成今日安排。">
+<title>登录 · 校园百事通｜温州大学</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8E%93%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="assets/css/main.css">
+</head>
+<body class="auth-body">
+
+<div class="auth-wrap">
+
+  <!-- 背景素材与授权：assets/img/auth/NOTICE.md -->
+  <div class="auth-backdrop" aria-hidden="true"></div>
+  <canvas class="auth-ripple" id="authRipple" aria-hidden="true"></canvas>
+
+  <!-- 左：品牌与价值主张 -->
+  <section class="auth-art">
+    <div class="auth-art-in">
+      <div class="auth-brand">
+        <div class="brand-logo lg">通</div>
+        <div>
+          <strong>校园百事通</strong>
+          <span>温州大学 · 校园生活一站式助手</span>
+        </div>
+      </div>
+
+      <div class="auth-art-copy">
+        <h1>登一次，<br>把整个校园装进口袋。</h1>
+        <p class="auth-sub">导入课表 PDF，或在首页用文字、截图添加课程调整；结合天气和你的作业、计划，每天给你一份「今天该怎么过」的安排。</p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- 右：登录表单 -->
+  <section class="auth-panel">
+    <div class="auth-card">
+      <div class="auth-card-head">
+        <h2>登录</h2>
+        <p>使用温州大学统一身份认证（学号 + 密码）登录</p>
+      </div>
+
+      <form id="loginForm" novalidate>
+        <div class="field">
+          <label>学号</label>
+          <input class="input" id="sid" inputmode="numeric" autocomplete="username" placeholder="请输入学号，例如 20230427" maxlength="20">
+        </div>
+
+        <div class="field">
+          <label>密码</label>
+          <div class="pwd-wrap">
+            <input class="input" id="pwd" type="password" autocomplete="current-password" placeholder="请输入教务系统登录密码" maxlength="32">
+            <button class="pwd-eye" id="eye" type="button" title="显示 / 隐藏密码">👁</button>
+          </div>
+        </div>
+
+        <div class="row auth-opt">
+          <label class="check"><input type="checkbox" id="remember" checked><span>记住登录状态</span></label>
+          <a class="link" id="demoFill">用演示账号登录 →</a>
+        </div>
+
+        <button class="btn btn-primary btn-block auth-submit" id="submitBtn" type="submit">登录并进入校园百事通</button>
+        <div class="err" id="err"></div>
+      </form>
+
+      <div class="auth-steps" id="steps"></div>
+
+      <!-- 本机登录过的账号：一键切换，不用重输密码 -->
+      <div class="acct-switch" id="acctSwitch" hidden>
+        <div class="sec-title"><span class="bar"></span>本机登录过的账号
+          <span class="more" style="color:var(--muted);font-weight:400">点一下直接切换</span></div>
+        <div id="asList"></div>
+        <div class="as-note">每个学号的课表、作业、计划各存一份（只在本机浏览器里），换回来数据都还在。</div>
+      </div>
+
+      <div class="auth-hint">演示账号：学号 <b>20230427</b> ／ 密码 <b>wzu@2026</b></div>
+    </div>
+  </section>
+
+</div>
+
+<script src="assets/js/store.js"></script>
+<script src="assets/js/auth-atmosphere.js"></script>
+<script src="assets/js/login.js"></script>
+</body>
+</html>

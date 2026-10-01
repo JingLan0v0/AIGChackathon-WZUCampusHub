@@ -1,0 +1,16 @@
+{
+  "name": "213aigc-campus-hub",
+  "version": "1.0.0",
+  "private": true,
+  "description": "校园百事通 · 温大学生的一站式校园生活助手（浏览器界面与 Node 本地识别服务，无第三方运行时依赖）",
+  "scripts": {
+    "serve": "node campus-hub/tools/serve.js",
+    "test": "node campus-hub/tests/logic.test.js && node campus-hub/tests/ui.test.js && node campus-hub/tests/pdf.test.js && node campus-hub/tests/consistency.test.js",
+    "test:syntax": "node campus-hub/tools/check-syntax.js",
+    "test:ai": "node campus-hub/tests/deepseek.test.js && node campus-hub/tests/assistant.test.js"
+  },
+  "devDependencies": {
+    "jsdom": "^30.1.1",
+    "pdfjs-dist": "3.11.174"
+  }
+}

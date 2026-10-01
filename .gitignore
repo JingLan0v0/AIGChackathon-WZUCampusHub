@@ -1,0 +1,23 @@
+
+# ---------------------------------------------------------------
+# 校园百事通 / Campus Hub
+# ---------------------------------------------------------------
+# 测试依赖（应用本身零依赖，这些只在跑测试时装）
+node_modules/
+
+# 演示稿的「渲染自查」截图（本地 QA 用，不是交付物）
+roadshow/deck-check/
+
+# 本地临时文件
+*.tmp
+*.log
+.DS_Store
+Thumbs.db
+
+# Local credentials must never be committed
+.env
+.env.*
+!.env.example
+*.dpapi
+*.key
+.local/
